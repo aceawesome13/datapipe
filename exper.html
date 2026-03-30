@@ -139,39 +139,37 @@
     }
   };
 
- const distraction = {
+const distraction = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: function() {
-    let html = "<p>Fを押してください</p><div class='grid'>";
+    let html = "<p>Fをクリックしてください</p><div class='grid'>";
     for (let i = 0; i < 25; i++) {
       const letter = Math.random() < 0.6 ? "F" : "E";
-      html += `<div class="distraction-cell" data-letter>${letter}</div>`;
+      html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
     }
     html += "</div>";
     return html;
   },
-  choices: ['f', 'F'],
-  response_ends_trial: false,
-  trial_duration: null,
+  choices: "NO_KEYS",
   on_load: function() {
-    const listener = jsPsych.pluginAPI.getKeyboardResponse({
-      callback_function: function(info) {
-        document.querySelectorAll("[data-letter]").forEach(cell => {
-          cell.textContent = "E";
-        });
+    document.querySelectorAll(".distraction-cell").forEach(cell => {
+      cell.addEventListener("click", () => {
+        const clickedLetter = cell.dataset.letter;
 
-        setTimeout(() => {
-          jsPsych.pluginAPI.cancelKeyboardResponse(listener);
-          jsPsych.finishTrial({
-            task: "distraction",
-            key_press: info.key
+        if (clickedLetter === "F") {
+          document.querySelectorAll(".distraction-cell").forEach(c => {
+            c.textContent = "E";
+            c.dataset.letter = "E";
           });
-        }, 500);
-      },
-      valid_responses: ['f', 'F'],
-      rt_method: 'performance',
-      persist: false,
-      allow_held_key: false
+
+          setTimeout(() => {
+            jsPsych.finishTrial({
+              task: "distraction",
+              clicked: "F"
+            });
+          }, 500);
+        }
+      });
     });
   },
   data: {
