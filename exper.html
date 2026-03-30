@@ -90,7 +90,7 @@
 
   const fullscreen = {
     type: jsPsychFullscreen,
-    message: "<p>全画面表示に切り替えます</p>",
+    message: "<p>全画面表示に切り替えます?</p>",
     button_label: "開始",
     fullscreen_mode: true
   };
@@ -231,7 +231,6 @@ const blank_wait = {
   for (let i = 0; i < 5; i++) {
     timeline.push(encoding);
     timeline.push(distraction);
-    timeline.push(blank_wait);
     timeline.push(retrieval);
   }
 
