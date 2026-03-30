@@ -156,19 +156,17 @@ const distraction = {
       cell.addEventListener("click", () => {
         const clickedLetter = cell.dataset.letter;
 
-        if (clickedLetter === "F") {
-          document.querySelectorAll(".distraction-cell").forEach(c => {
-            c.textContent = "E";
-            c.dataset.letter = "E";
-          });
+    if (clickedLetter === "F") {
+  cell.textContent = "E";
+  cell.dataset.letter = "E";
 
-          setTimeout(() => {
-            jsPsych.finishTrial({
-              task: "distraction",
-              clicked: "F"
-            });
-          }, 500);
-        }
+  setTimeout(() => {
+    jsPsych.finishTrial({
+      task: "distraction",
+      clicked: "F"
+    });
+  }, 500);
+}
       });
     });
   },
