@@ -15,27 +15,38 @@
 
 <style>
 .grid {
-display:grid;
-grid-template-columns: repeat(5, 60px);
-grid-gap:5px;
-justify-content:center;
+  display:grid;
+  grid-template-columns: repeat(5, 60px);
+  grid-gap:5px;
+  justify-content:center;
+  margin:20px auto;
 }
 .cell {
-width:60px;
-height:60px;
-border:1px solid black;
-position:relative;
-cursor:pointer;
+  width:60px;
+  height:60px;
+  border:1px solid black;
+  position:relative;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
 }
 .circle {
-width:30px;
-height:30px;
-background:red;
-border-radius:50%;
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
+  width:30px;
+  height:30px;
+  background:red;
+  border-radius:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+#done {
+  display:block;
+  margin:20px auto;
+  padding:10px 20px;
+  font-size:16px;
 }
 </style>
 
@@ -43,160 +54,154 @@ transform:translate(-50%,-50%);
 <body></body>
 
 <script>
-
 const jsPsych = initJsPsych();
-
-const subject_id = jsPsych.randomization.randomID(10);
-const filename = `${subject_id}.csv`;
 
 let participant_id = "";
 let encoding_positions = [];
 let userSelections = [];
 
 const predefinedEncodingPositions = [
-[[4,0],[3,1],[2,2]],
-[[4,2],[4,3],[4,4]],
-[[1,0],[1,1],[2,2]],
-[[0,0],[1,1],[3,3]],
-[[2,0],[2,4],[4,2]]
+  [[4,0],[3,1],[2,2]],
+  [[4,2],[4,3],[4,4]],
+  [[1,0],[1,1],[2,2]],
+  [[0,0],[1,1],[3,3]],
+  [[2,0],[2,4],[4,2]]
 ];
 
 let currentSetIndex = 0;
 
 // fullscreen
 const fullscreen = {
-type: jsPsychFullscreen,
-message:"全画面表示に切り替えます",
-button_label:"開始",
-fullscreen_mode:true
+  type: jsPsychFullscreen,
+  message:"全画面表示に切り替えます",
+  button_label:"開始",
+  fullscreen_mode:true
 };
 
 // participant id
 const form_trial = {
-type: jsPsychSurveyText,
-questions:[
-{prompt:"参加者IDを入力してください",name:"ID",required:true}
-],
-on_finish:function(data){
-participant_id = JSON.parse(data.responses).ID;
-}
+  type: jsPsychSurveyText,
+  questions:[
+    {prompt:"参加者IDを入力してください", name:"ID", required:true}
+  ],
+  on_finish: function(data){
+    participant_id = data.response.ID;
+  }
 };
 
 // encoding
 const encoding = {
-type: jsPsychHtmlKeyboardResponse,
-stimulus:function(){
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function(){
+    encoding_positions = predefinedEncodingPositions[currentSetIndex];
+    currentSetIndex = (currentSetIndex + 1) % predefinedEncodingPositions.length;
 
-encoding_positions = predefinedEncodingPositions[currentSetIndex];
-currentSetIndex = (currentSetIndex+1)%predefinedEncodingPositions.length;
+    let html = "<p>点の位置を覚えてください</p><div class='grid'>";
 
-let html="<p>点の位置を覚えてください</p><div class='grid'>";
+    for(let i=0; i<25; i++){
+      let x = i % 5;
+      let y = Math.floor(i / 5);
+      html += "<div class='cell'>";
+      if(encoding_positions.some(p => p[0] === x && p[1] === y)){
+        html += "<div class='circle'></div>";
+      }
+      html += "</div>";
+    }
 
-for(let i=0;i<25;i++){
-let x=i%5;
-let y=Math.floor(i/5);
-html+="<div class='cell'>";
-if(encoding_positions.some(p=>p[0]==x && p[1]==y)){
-html+="<div class='circle'></div>";
-}
-html+="</div>";
-}
-
-html+="</div>";
-return html;
-},
-choices:"NO_KEYS",
-trial_duration:3000
+    html += "</div>";
+    return html;
+  },
+  choices: "NO_KEYS",
+  trial_duration: 3000
 };
 
 // distraction
 const distraction = {
-type: jsPsychHtmlKeyboardResponse,
-stimulus:function(){
-
-let html="<p>Fを押してください</p><div class='grid'>";
-for(let i=0;i<25;i++){
-let letter=Math.random()<0.6?"F":"E";
-html+=`<div class='cell'>${letter}</div>`;
-}
-html+="</div>";
-return html;
-},
-trial_duration:3000
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function(){
+    let html = "<p>Fを押してください</p><div class='grid'>";
+    for(let i=0; i<25; i++){
+      let letter = Math.random() < 0.6 ? "F" : "E";
+      html += `<div class='cell'>${letter}</div>`;
+    }
+    html += "</div>";
+    return html;
+  },
+  choices: ['f', 'F'],
+  response_ends_trial: true,
+  trial_duration: 3000
 };
 
 // retrieval
 const retrieval = {
-type: jsPsychHtmlKeyboardResponse,
-stimulus:function(){
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function(){
+    userSelections = [];
 
-userSelections=[];
+    let html = "<p>点はどこにありましたか？</p><div class='grid'>";
 
-let html="<p>点はどこにありましたか？</p><div class='grid'>";
+    for(let i=0; i<25; i++){
+      html += `<div class="cell" data-index="${i}"></div>`;
+    }
 
-for(let i=0;i<25;i++){
-html+=`<div class="cell" data-index="${i}"></div>`;
-}
+    html += "</div><button id='done'>完了</button>";
+    return html;
+  },
+  choices: "NO_KEYS",
+  on_load: function(){
+    document.querySelectorAll(".cell").forEach((cell, i) => {
+      cell.addEventListener("click", () => {
+        if(cell.querySelector(".circle")){
+          cell.innerHTML = "";
+          userSelections = userSelections.filter(x => x !== i);
+        } else {
+          cell.innerHTML = "<div class='circle'></div>";
+          userSelections.push(i);
+        }
+      });
+    });
 
-html+="</div><button id='done'>完了</button>";
-return html;
-},
-choices:"NO_KEYS",
-on_load:function(){
-
-document.querySelectorAll(".cell").forEach((cell,i)=>{
-cell.addEventListener("click",()=>{
-
-if(cell.querySelector(".circle")){
-cell.innerHTML="";
-userSelections=userSelections.filter(x=>x!=i);
-}else{
-cell.innerHTML="<div class='circle'></div>";
-userSelections.push(i);
-}
-});
-});
-
-document.getElementById("done").addEventListener("click",()=>{
-jsPsych.finishTrial({
-response:userSelections
-});
-});
-}
+    document.getElementById("done").addEventListener("click", () => {
+      jsPsych.finishTrial({
+        participant_id: participant_id,
+        response: JSON.stringify(userSelections),
+        encoding_positions: JSON.stringify(encoding_positions)
+      });
+    });
+  }
 };
 
 // debrief
-const debrief={
-type: jsPsychHtmlButtonResponse,
-stimulus:"終了です。ありがとうございました。",
-choices:["終了"]
+const debrief = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus:"終了です。ありがとうございました。",
+  choices:["終了"]
 };
 
 // datapipe save
-const save_data={
-type: jsPsychPipe,
-action:"save",
-experiment_id:"8vGt7oHuZjuJ",
-filename:filename,
-data_string:()=>jsPsych.data.get().csv()
+const save_data = {
+  type: jsPsychPipe,
+  action:"save",
+  experiment_id:"8vGt7oHuZjuJ",
+  filename: () => `${participant_id}.csv`,
+  data_string: () => jsPsych.data.get().csv()
 };
 
 // timeline
-let timeline=[];
+let timeline = [];
 
 timeline.push(fullscreen);
 timeline.push(form_trial);
 
-for(let i=0;i<5;i++){
-timeline.push(encoding);
-timeline.push(distraction);
-timeline.push(retrieval);
+for(let i=0; i<5; i++){
+  timeline.push(encoding);
+  timeline.push(distraction);
+  timeline.push(retrieval);
 }
 
 timeline.push(debrief);
 timeline.push(save_data);
 
 jsPsych.run(timeline);
-
 </script>
 </html>
