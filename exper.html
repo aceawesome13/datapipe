@@ -1,32 +1,75 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>My experiment</title>
-    <script src="https://unpkg.com/jspsych@7.3.2"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
-    <link href="https://unpkg.com/jspsych@7.3.2/css/jspsych.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body></body>
-  <script>
-    const jsPsych = initJsPsych();
+<head>
+<meta charset="UTF-8">
+<title>GridEX</title>
 
-   const subject_id = jsPsych.randomization.randomID(10);
-   const filename = `${subject_id}.csv`;
-      
-    const hello_trial = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: 'Hello world!'
-    }
+<script src="https://unpkg.com/jspsych@7.3.2"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+<script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2"></script>
+<script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.2"></script>
+<script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
 
-       const save_data = {
-                type: jsPsychPipe,
-                action: "save",
-                experiment_id: "8vGt7oHuZjuJ",
-                filename: filename,
-                data_string: ()=>jsPsych.data.get().csv()
-              };
-    
- jsPsych.run([hello_trial, save_data]);
-  </script>
+<link href="https://unpkg.com/jspsych@7.3.2/css/jspsych.css" rel="stylesheet" />
+
+</head>
+<body></body>
+
+<script>
+
+const jsPsych = initJsPsych();
+
+const subject_id = jsPsych.randomization.randomID(10);
+const filename = `${subject_id}.csv`;
+
+var participant_id = "";
+
+// fullscreen
+var fullscreen = {
+type: jsPsychFullscreen,
+message: "<p>全画面表示に切り替えます。</p>",
+button_label: "開始",
+fullscreen_mode: true
+};
+
+// participant id
+var form_trial = {
+type: jsPsychSurveyText,
+questions: [
+{prompt: "参加者IDを入力してください", name: 'ID', required: true}
+],
+on_finish: function(data){
+participant_id = JSON.parse(data.responses).ID;
+}
+};
+
+// welcome
+var welcome = {
+type: jsPsychHtmlButtonResponse,
+stimulus: "Hello world!",
+choices: ['次へ']
+};
+
+// timeline
+var timeline = [];
+
+timeline.push(fullscreen);
+timeline.push(form_trial);
+timeline.push(welcome);
+
+// 저장 (DataPipe)
+const save_data = {
+type: jsPsychPipe,
+action: "save",
+experiment_id: "8vGt7oHuZjuJ",
+filename: filename,
+data_string: ()=>jsPsych.data.get().csv()
+};
+
+timeline.push(save_data);
+
+jsPsych.run(timeline);
+
+</script>
 </html>
