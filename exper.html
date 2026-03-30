@@ -85,7 +85,7 @@ participant_id = JSON.parse(data.responses).ID;
 // encoding
 const encoding = {
 type: jsPsychHtmlKeyboardResponse,
-stimulus:function(){
+stimulus: function(){
 
 encoding_positions = predefinedEncodingPositions[currentSetIndex];
 currentSetIndex = (currentSetIndex+1)%predefinedEncodingPositions.length;
@@ -105,10 +105,9 @@ html+="</div>";
 html+="</div>";
 return html;
 },
-choices:"NO_KEYS",
-trial_duration:3000
+choices: "NO_KEYS",
+trial_duration: 3000
 };
-
 // distraction
 const distraction = {
 type: jsPsychHtmlKeyboardResponse,
