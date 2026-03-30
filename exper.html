@@ -151,22 +151,21 @@ const distraction = {
     return html;
   },
   choices: "NO_KEYS",
+  trial_duration: 8000,
   on_load: function() {
+    let alreadyClicked = false;
+
     document.querySelectorAll(".distraction-cell").forEach(cell => {
       cell.addEventListener("click", () => {
+        if (alreadyClicked) return;
+
         const clickedLetter = cell.dataset.letter;
 
-    if (clickedLetter === "F") {
-  cell.textContent = "E";
-  cell.dataset.letter = "E";
-
-  setTimeout(() => {
-    jsPsych.finishTrial({
-      task: "distraction",
-      clicked: "F"
-    });
-  }, 8000);
-}
+        if (clickedLetter === "F") {
+          alreadyClicked = true;
+          cell.textContent = "E";
+          cell.dataset.letter = "E";
+        }
       });
     });
   },
