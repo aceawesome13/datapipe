@@ -105,25 +105,9 @@ html+="</div>";
 html+="</div>";
 return html;
 },
-choices: "NO_KEYS",
+choices: jsPsych.NO_KEYS,
 trial_duration: 3000
 };
-// distraction
-const distraction = {
-type: jsPsychHtmlKeyboardResponse,
-stimulus:function(){
-
-let html="<p>Fを押してください</p><div class='grid'>";
-for(let i=0;i<25;i++){
-let letter=Math.random()<0.6?"F":"E";
-html+=`<div class='cell'>${letter}</div>`;
-}
-html+="</div>";
-return html;
-},
-trial_duration:3000
-};
-
 // retrieval
 const retrieval = {
 type: jsPsychHtmlKeyboardResponse,
@@ -155,7 +139,21 @@ userSelections.push(i);
 }
 });
 });
+const distraction = {
+type: jsPsychHtmlKeyboardResponse,
+stimulus:function(){
 
+let html="<p>Fを押してください</p><div class='grid'>";
+for(let i=0;i<25;i++){
+let letter=Math.random()<0.6?"F":"E";
+html+=`<div class='cell'>${letter}</div>`;
+}
+html+="</div>";
+return html;
+},
+choices: jsPsych.NO_KEYS,
+trial_duration:3000
+};
 document.getElementById("done").addEventListener("click",()=>{
 jsPsych.finishTrial({
 response:userSelections
