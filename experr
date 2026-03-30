@@ -127,24 +127,23 @@
   };
 
   const distraction = {
-    type: jsPsychHtmlKeyboardResponse,
-    stimulus: function() {
-      let html = "<p>Fを押してください</p><div class='grid'>";
-      for (let i = 0; i < 25; i++) {
-        const letter = Math.random() < 0.6 ? "F" : "E";
-        html += `<div class="cell">${letter}</div>`;
-      }
-      html += "</div>";
-      return html;
-    },
-    choices: ['f', 'F'],
-    trial_duration: 3000,
-    response_ends_trial: true,
-    data: {
-      task: "distraction"
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    let html = "<p>Fを押してください</p><div class='grid'>";
+    for (let i = 0; i < 25; i++) {
+      const letter = Math.random() < 0.6 ? "F" : "E";
+      html += `<div class="distraction-cell">${letter}</div>`;
     }
-  };
-
+    html += "</div>";
+    return html;
+  },
+  choices: ['f', 'F'],
+  trial_duration: 3000,
+  response_ends_trial: true,
+  data: {
+    task: "distraction"
+  }
+};
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
