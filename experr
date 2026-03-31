@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>GridEX Test</title>
+  <title>Dot Memory</title>
 
   <script src="https://unpkg.com/jspsych@7.3.2"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
@@ -34,9 +34,22 @@
       user-select: none;
     }
 
+    .distraction-cell {
+      width: 60px;
+      height: 60px;
+      border: none;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+    }
+
     .circle {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       background: red;
       border-radius: 50%;
       position: absolute;
@@ -49,8 +62,13 @@
       display: block;
       margin: 20px auto;
       padding: 10px 20px;
-      font-size: 16px;
+      font-size: 20px;
     }
+
+      .jspsych-btn {
+    font-size: 20px;
+    padding: 10px 20px;
+  }
   </style>
 </head>
 <body></body>
@@ -65,6 +83,7 @@
   let participant_id = "";
   let encoding_positions = [];
   let userSelections = [];
+  let fClickCount = 0;
 
   const predefinedEncodingPositions = [
     [[4,0],[3,1],[2,2]],
@@ -76,22 +95,23 @@
 
   let currentSetIndex = 0;
 
-const fullscreen = {
-  type: jsPsychFullscreen,
-  message: "<p>全画面表示に切り替えます</p>",
-  button_label: "開始",
-  fullscreen_mode: true
-};
+  const fullscreen = {
+    type: jsPsychFullscreen,
+    message: '<p style="font-size: 24px;">全画表示に切り替えます</p>',
+    button_label: "開始",
+    fullscreen_mode: true
+  };
 
   const form_trial = {
     type: jsPsychSurveyText,
     questions: [
       {
-        prompt: "参加者IDを入力してください",
+        prompt: '<p style="font-size: 24px;">参加者IDを入力してください</p>',
         name: "ID",
         required: true
       }
     ],
+    button_label: "次へ",
     on_finish: function(data) {
       participant_id = data.response.ID;
     }
@@ -103,7 +123,7 @@ const fullscreen = {
       encoding_positions = predefinedEncodingPositions[currentSetIndex];
       currentSetIndex = (currentSetIndex + 1) % predefinedEncodingPositions.length;
 
-      let html = "<p>点の位置を覚えてください</p><div class='grid'>";
+      let html = '<p style="font-size: 24px;">点の位置を覚えてください</p><div class="grid">';
 
       for (let i = 0; i < 25; i++) {
         const x = i % 5;
@@ -127,37 +147,75 @@ const fullscreen = {
   };
 
   const distraction = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: function() {
-    let html = "<p>Fを押してください</p><div class='grid'>";
-    for (let i = 0; i < 25; i++) {
-      const letter = Math.random() < 0.6 ? "F" : "E";
-      html += `<div class="distraction-cell">${letter}</div>`;
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+      let html = '<p style="font-size: 24px;">Fを押してください</p><div class="grid">';
+      for (let i = 0; i < 25; i++) {
+        const letter = Math.random() < 0.6 ? "F" : "E";
+        html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
+      }
+      html += "</div>";
+      return html;
+    },
+    choices: "NO_KEYS",
+    trial_duration: 8000,
+
+    on_start: function() {
+      fClickCount = 0;
+    },
+
+    on_load: function() {
+      document.querySelectorAll(".distraction-cell").forEach(cell => {
+        cell.addEventListener("click", () => {
+          const clickedLetter = cell.dataset.letter;
+
+          if (clickedLetter === "F") {
+            fClickCount++;
+            cell.textContent = "E";
+            cell.dataset.letter = "E";
+          }
+        });
+      });
+    },
+
+    on_finish: function(data) {
+      data.task = "distraction";
+      data.f_click_count = fClickCount;
+      data.participant_id = participant_id;
     }
-    html += "</div>";
-    return html;
-  },
-  choices: ['f', 'F'],
-  trial_duration: 3000,
-  response_ends_trial: true,
-  data: {
-    task: "distraction"
-  }
+  };
+const rest_20s = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "",
+  choices: "NO_KEYS",
+  trial_duration: 500
 };
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
       userSelections = [];
 
-      let html = "<p>点はどこにありましたか？</p><div class='grid'>";
+      let html = `
+        <p style="font-size: 24px;">点はどこにありましたか？</p>
+        <div class="grid">
+      `;
+
       for (let i = 0; i < 25; i++) {
         html += `<div class="cell" data-index="${i}"></div>`;
       }
-      html += "</div><button id='done'>完了</button>";
+
+      html += `
+        </div>
+        <button id="done" disabled>完了</button>
+      `;
+
       return html;
     },
     choices: "NO_KEYS",
+
     on_load: function() {
+      const doneButton = document.getElementById("done");
+
       document.querySelectorAll(".cell").forEach((cell, i) => {
         cell.addEventListener("click", () => {
           if (cell.querySelector(".circle")) {
@@ -167,16 +225,20 @@ const fullscreen = {
             cell.innerHTML = "<div class='circle'></div>";
             userSelections.push(i);
           }
+
+          doneButton.disabled = (userSelections.length !== 3);
         });
       });
 
-      document.getElementById("done").addEventListener("click", () => {
-        jsPsych.finishTrial({
-          task: "retrieval",
-          participant_id: participant_id,
-          response: JSON.stringify(userSelections),
-          encoding_positions: JSON.stringify(encoding_positions)
-        });
+      doneButton.addEventListener("click", () => {
+        if (userSelections.length === 3) {
+          jsPsych.finishTrial({
+            task: "retrieval",
+            participant_id: participant_id,
+            response: JSON.stringify(userSelections),
+            encoding_positions: JSON.stringify(encoding_positions)
+          });
+        }
       });
     }
   };
@@ -194,6 +256,7 @@ const fullscreen = {
   for (let i = 0; i < 5; i++) {
     timeline.push(encoding);
     timeline.push(distraction);
+    timeline.push(rest_20s);
     timeline.push(retrieval);
   }
 
