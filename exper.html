@@ -97,7 +97,7 @@
 
   const fullscreen = {
     type: jsPsychFullscreen,
-    message: '<p style="font-size: 26px;">全画表示に切り替えます</p>',
+    message: '<p style="font-size: 24px;">全画表示に切り替えます</p>',
     button_label: "開始",
     fullscreen_mode: true
   };
@@ -106,7 +106,7 @@
     type: jsPsychSurveyText,
     questions: [
       {
-        prompt: "参加者IDを入力してください",
+        prompt: '<p style="font-size: 24px;">参加者IDを入力してください</p>',
         name: "ID",
         required: true
       }
@@ -123,7 +123,7 @@
       encoding_positions = predefinedEncodingPositions[currentSetIndex];
       currentSetIndex = (currentSetIndex + 1) % predefinedEncodingPositions.length;
 
-      let html = '<p style="font-size: 26px;">点の位置を覚えてください</p><div class="grid">';
+      let html = '<p style="font-size: 24px;">点の位置を覚えてください</p><div class="grid">';
 
       for (let i = 0; i < 25; i++) {
         const x = i % 5;
@@ -149,7 +149,7 @@
   const distraction = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
-      let html = '<p style="font-size: 26px;">Fを押してください</p><div class="grid">';
+      let html = '<p style="font-size: 24px;">Fを押してください</p><div class="grid">';
       for (let i = 0; i < 25; i++) {
         const letter = Math.random() < 0.6 ? "F" : "E";
         html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
@@ -196,7 +196,7 @@ const rest_20s = {
       userSelections = [];
 
       let html = `
-        <p style="font-size: 26px;">点はどこにありましたか？</p>
+        <p style="font-size: 24px;">点はどこにありましたか？</p>
         <div class="grid">
       `;
 
