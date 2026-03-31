@@ -90,7 +90,7 @@
 
   const fullscreen = {
     type: jsPsychFullscreen,
-    message: "<p>全画表示に切り替えます?</p>",
+    message: "<p>全画表示に切り替えます</p>",
     button_label: "開始",
     fullscreen_mode: true
   };
@@ -139,10 +139,12 @@
     }
   };
 
+let fClickCount = 0;
+
 const distraction = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: function() {
-    let html = "<p>Fをクリックしてください</p><div class='grid'>";
+    let html = "<p>F를 클릭하세요</p><div class='grid'>";
     for (let i = 0; i < 25; i++) {
       const letter = Math.random() < 0.6 ? "F" : "E";
       html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
@@ -152,25 +154,30 @@ const distraction = {
   },
   choices: "NO_KEYS",
   trial_duration: 8000,
-  on_load: function() {
-    let alreadyClicked = false;
 
+  on_start: function() {
+    fClickCount = 0;
+  },
+
+  on_load: function() {
     document.querySelectorAll(".distraction-cell").forEach(cell => {
       cell.addEventListener("click", () => {
-        if (alreadyClicked) return;
-
         const clickedLetter = cell.dataset.letter;
 
         if (clickedLetter === "F") {
-          alreadyClicked = true;
+          fClickCount++;
+
+          // 눌린 F는 E로 바꿔서 중복 카운트 방지
           cell.textContent = "E";
           cell.dataset.letter = "E";
         }
       });
     });
   },
-  data: {
-    task: "distraction"
+
+  on_finish: function(data) {
+    data.task = "distraction";
+    data.f_click_count = fClickCount;
   }
 };
 
