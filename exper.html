@@ -47,8 +47,8 @@
     }
 
     .circle {
-      width: 40px;
-      height: 40px;
+      width: 35px;
+      height: 35px;
       background: red;
       border-radius: 50%;
       position: absolute;
@@ -182,31 +182,69 @@ const distraction = {
 };
 
 
-  const retrieval = {
-    type: jsPsychHtmlKeyboardResponse,
-    stimulus: function() {
-      userSelections = [];
+ const retrieval = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    userSelections = [];
 
-      let html = "<p>点はどこにありましたか？</p><div class='grid'>";
-      for (let i = 0; i < 25; i++) {
-        html += `<div class="cell" data-index="${i}"></div>`;
-      }
-      html += "</div><button id='done'>完了</button>";
-      return html;
-    },
-    choices: "NO_KEYS",
-    on_load: function() {
-      document.querySelectorAll(".cell").forEach((cell, i) => {
-        cell.addEventListener("click", () => {
-          if (cell.querySelector(".circle")) {
-            cell.innerHTML = "";
-            userSelections = userSelections.filter(x => x !== i);
-          } else {
+    let html = `
+      <p>点はどこにありましたか？（3つ選んでください）</p>
+      <div class='grid'>
+    `;
+
+    for (let i = 0; i < 25; i++) {
+      html += `<div class="cell" data-index="${i}"></div>`;
+    }
+
+    html += `
+      </div>
+      <p id="warning" style="color:red; display:none;">3つ選んでください</p>
+      <button id="done" disabled>完了</button>
+    `;
+
+    return html;
+  },
+  choices: "NO_KEYS",
+
+  on_load: function() {
+    const doneButton = document.getElementById("done");
+    const warning = document.getElementById("warning");
+
+    document.querySelectorAll(".cell").forEach((cell, i) => {
+      cell.addEventListener("click", () => {
+        if (cell.querySelector(".circle")) {
+          // 이미 선택된 셀 다시 클릭 → 해제
+          cell.innerHTML = "";
+          userSelections = userSelections.filter(x => x !== i);
+        } else {
+          // 3개 미만일 때만 새로 선택 가능
+          if (userSelections.length < 3) {
             cell.innerHTML = "<div class='circle'></div>";
             userSelections.push(i);
           }
-        });
+        }
+
+        // 선택 개수에 따라 완료 버튼 활성화/비활성화
+        if (userSelections.length === 3) {
+          doneButton.disabled = false;
+          warning.style.display = "none";
+        } else {
+          doneButton.disabled = true;
+        }
       });
+    });
+
+    doneButton.addEventListener("click", () => {
+      if (userSelections.length === 3) {
+        jsPsych.finishTrial({
+          responses: userSelections
+        });
+      } else {
+        warning.style.display = "block";
+      }
+    });
+  }
+};
 
       document.getElementById("done").addEventListener("click", () => {
         jsPsych.finishTrial({
