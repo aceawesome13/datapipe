@@ -118,7 +118,7 @@
       encoding_positions = predefinedEncodingPositions[currentSetIndex];
       currentSetIndex = (currentSetIndex + 1) % predefinedEncodingPositions.length;
 
-      let html = '<p style="font-size: 32px;">点の位置を覚えてください</p><div class="grid">';
+      let html = '<p style="font-size: 26px;">点の位置を覚えてください</p><div class="grid">';
 
       for (let i = 0; i < 25; i++) {
         const x = i % 5;
@@ -144,7 +144,7 @@
   const distraction = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
-      let html = '<p style="font-size: 32px;">Fを押してください</p><div class="grid">';
+      let html = '<p style="font-size: 26px;">Fを押してください</p><div class="grid">';
       for (let i = 0; i < 25; i++) {
         const letter = Math.random() < 0.6 ? "F" : "E";
         html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
@@ -186,7 +186,7 @@
       userSelections = [];
 
       let html = `
-        <p style="font-size: 32px;">点はどこにありましたか？</p>
+        <p style="font-size: 26px;">点はどこにありましたか？</p>
         <div class="grid">
       `;
 
