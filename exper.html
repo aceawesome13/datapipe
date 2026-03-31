@@ -180,14 +180,13 @@ const distraction = {
   }
 };
 
-
- const retrieval = {
+const retrieval = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: function() {
     userSelections = [];
 
     let html = `
-      <p>点はどこにありましたか？</p>
+      <p style="font-size: 32px; font-weight: bold;">点はどこにありましたか？</p>
       <div class='grid'>
     `;
 
@@ -212,14 +211,11 @@ const distraction = {
     document.querySelectorAll(".cell").forEach((cell, i) => {
       cell.addEventListener("click", () => {
         if (cell.querySelector(".circle")) {
-   
           cell.innerHTML = "";
           userSelections = userSelections.filter(x => x !== i);
         } else {
-
-            cell.innerHTML = "<div class='circle'></div>";
-            userSelections.push(i);
-          }
+          cell.innerHTML = "<div class='circle'></div>";
+          userSelections.push(i);
         }
 
         if (userSelections.length === 3) {
@@ -227,6 +223,7 @@ const distraction = {
           warning.style.display = "none";
         } else {
           doneButton.disabled = true;
+          warning.style.display = "block";
         }
       });
     });
@@ -234,7 +231,10 @@ const distraction = {
     doneButton.addEventListener("click", () => {
       if (userSelections.length === 3) {
         jsPsych.finishTrial({
-          responses: userSelections
+          task: "retrieval",
+          participant_id: participant_id,
+          response: JSON.stringify(userSelections),
+          encoding_positions: JSON.stringify(encoding_positions)
         });
       } else {
         warning.style.display = "block";
@@ -242,8 +242,7 @@ const distraction = {
     });
   }
 };
-
-
+ 
   const debrief = {
     type: jsPsychHtmlButtonResponse,
     stimulus: "終了です。ありがとうございました。",
