@@ -166,8 +166,7 @@ const distraction = {
 
         if (clickedLetter === "F") {
           fClickCount++;
-
-          // 눌린 F는 E로 바꿔서 중복 카운트 방지
+          
           cell.textContent = "E";
           cell.dataset.letter = "E";
         }
@@ -188,7 +187,7 @@ const distraction = {
     userSelections = [];
 
     let html = `
-      <p>点はどこにありましたか？（3つ選んでください）</p>
+      <p>点はどこにありましたか？</p>
       <div class='grid'>
     `;
 
@@ -213,18 +212,17 @@ const distraction = {
     document.querySelectorAll(".cell").forEach((cell, i) => {
       cell.addEventListener("click", () => {
         if (cell.querySelector(".circle")) {
-          // 이미 선택된 셀 다시 클릭 → 해제
+   
           cell.innerHTML = "";
           userSelections = userSelections.filter(x => x !== i);
         } else {
-          // 3개 미만일 때만 새로 선택 가능
+
           if (userSelections.length < 3) {
             cell.innerHTML = "<div class='circle'></div>";
             userSelections.push(i);
           }
         }
 
-        // 선택 개수에 따라 완료 버튼 활성화/비활성화
         if (userSelections.length === 3) {
           doneButton.disabled = false;
           warning.style.display = "none";
