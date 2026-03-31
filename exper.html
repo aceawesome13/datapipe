@@ -179,7 +179,12 @@
       data.participant_id = participant_id;
     }
   };
-
+const rest_20s = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "",
+  choices: "NO_KEYS",
+  trial_duration: 20000
+};
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
@@ -246,6 +251,7 @@
   for (let i = 0; i < 5; i++) {
     timeline.push(encoding);
     timeline.push(distraction);
+    timeline.push(rest_20s);
     timeline.push(retrieval);
   }
 
