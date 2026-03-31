@@ -244,16 +244,6 @@ const distraction = {
   }
 };
 
-      document.getElementById("done").addEventListener("click", () => {
-        jsPsych.finishTrial({
-          task: "retrieval",
-          participant_id: participant_id,
-          response: JSON.stringify(userSelections),
-          encoding_positions: JSON.stringify(encoding_positions)
-        });
-      });
-    }
-  };
 
   const debrief = {
     type: jsPsychHtmlButtonResponse,
