@@ -144,7 +144,7 @@ let fClickCount = 0;
 const distraction = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: function() {
-    let html = "<p>F를 클릭하세요</p><div class='grid'>";
+    let html = "<p>Fを押してください</p><div class='grid'>";
     for (let i = 0; i < 25; i++) {
       const letter = Math.random() < 0.6 ? "F" : "E";
       html += `<div class="distraction-cell" data-letter="${letter}">${letter}</div>`;
