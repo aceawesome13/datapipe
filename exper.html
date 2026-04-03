@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Dot Memory</title>
 
   <script src="https://unpkg.com/jspsych@7.3.2"></script>
@@ -13,10 +13,6 @@
 
   <link href="https://unpkg.com/jspsych@7.3.2/css/jspsych.css" rel="stylesheet" />
 
-const subject_id = jsPsych.randomization.randomID(10);
-const filename = `${subject_id}.csv`;
-
-  
   <style>
     .grid {
       display: grid;
@@ -70,20 +66,23 @@ const filename = `${subject_id}.csv`;
       font-size: 20px;
     }
 
-      .jspsych-btn {
-    font-size: 20px;
-    padding: 10px 20px;
-  }
+    .jspsych-btn {
+      font-size: 20px;
+      padding: 10px 20px;
+    }
   </style>
 </head>
 <body></body>
 
 <script>
   const jsPsych = initJsPsych({
-    on_finish: function() {
+    on_finish: function () {
       console.log(jsPsych.data.get().values());
     }
   });
+
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
 
   let participant_id = "";
   let encoding_positions = [];
@@ -147,7 +146,10 @@ const filename = `${subject_id}.csv`;
     choices: "NO_KEYS",
     trial_duration: 3000,
     data: {
-      task: "encoding"
+      task: "encoding",
+      participant_id: function() {
+        return participant_id;
+      }
     }
   };
 
@@ -189,12 +191,20 @@ const filename = `${subject_id}.csv`;
       data.participant_id = participant_id;
     }
   };
-const rest_20s = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: "",
-  choices: "NO_KEYS",
-  trial_duration: 500
-};
+
+  const rest_20s = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "",
+    choices: "NO_KEYS",
+    trial_duration: 500,
+    data: {
+      task: "rest",
+      participant_id: function() {
+        return participant_id;
+      }
+    }
+  };
+
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
@@ -227,8 +237,10 @@ const rest_20s = {
             cell.innerHTML = "";
             userSelections = userSelections.filter(x => x !== i);
           } else {
-            cell.innerHTML = "<div class='circle'></div>";
-            userSelections.push(i);
+            if (userSelections.length < 3) {
+              cell.innerHTML = "<div class='circle'></div>";
+              userSelections.push(i);
+            }
           }
 
           doneButton.disabled = (userSelections.length !== 3);
@@ -251,7 +263,23 @@ const rest_20s = {
   const debrief = {
     type: jsPsychHtmlButtonResponse,
     stimulus: "終了です。ありがとうございました。",
-    choices: ["終了"]
+    choices: ["終了"],
+    data: {
+      task: "debrief",
+      participant_id: function() {
+        return participant_id;
+      }
+    }
+  };
+
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: "8vGt7oHuZjuJ",
+    filename: filename,
+    data_string: function() {
+      return jsPsych.data.get().csv();
+    }
   };
 
   const timeline = [];
@@ -265,16 +293,8 @@ const rest_20s = {
     timeline.push(retrieval);
   }
 
-
-  const save_data = {
-  type: jsPsychPipe,
-  action: "save",
-  experiment_id: "8vGt7oHuZjuJ",
-  filename: filename,
-  data_string: ()=>jsPsych.data.get().csv()
-};
-  
   timeline.push(debrief);
+  timeline.push(save_data);
 
   jsPsych.run(timeline);
 </script>
