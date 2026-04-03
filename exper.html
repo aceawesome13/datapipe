@@ -276,8 +276,8 @@
   
   const debrief = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: "終了です。ありがとうございました。",
-    choices: ["終了"],
+    stimulus: "下の課題完了ボタンを押た後，ブラウザを閉じて終了してください。ありがとうございました。",
+    choices: ["課題完了"],
     data: {
       task: "debrief",
       participant_id: function() {
@@ -289,13 +289,10 @@
   const save_data = {
     type: jsPsychPipe,
     action: "save",
-    experiment_id: "8vGt7oHuZjuJ",
-    filename: filename,
-    data_string: function() {
-      return jsPsych.data.get().csv();
-    }
+    experiment_id: expID,
+    filename: () => `dot_${participant_id}.csv`,
+    data_string: () => jsPsych.data.get().csv()
   };
-
   const timeline = [];
   timeline.push(fullscreen);
   timeline.push(form_trial);
