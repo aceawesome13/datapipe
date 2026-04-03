@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Dot Memory</title>
 
   <script src="https://unpkg.com/jspsych@7.3.2"></script>
@@ -13,6 +13,10 @@
 
   <link href="https://unpkg.com/jspsych@7.3.2/css/jspsych.css" rel="stylesheet" />
 
+const subject_id = jsPsych.randomization.randomID(10);
+const filename = `${subject_id}.csv`;
+
+  
   <style>
     .grid {
       display: grid;
@@ -66,23 +70,20 @@
       font-size: 20px;
     }
 
-    .jspsych-btn {
-      font-size: 20px;
-      padding: 10px 20px;
-    }
+      .jspsych-btn {
+    font-size: 20px;
+    padding: 10px 20px;
+  }
   </style>
 </head>
 <body></body>
 
 <script>
   const jsPsych = initJsPsych({
-    on_finish: function () {
+    on_finish: function() {
       console.log(jsPsych.data.get().values());
     }
   });
-
-  const subject_id = jsPsych.randomization.randomID(10);
-  const filename = `${subject_id}.csv`;
 
   let participant_id = "";
   let encoding_positions = [];
@@ -101,7 +102,7 @@
 
   const fullscreen = {
     type: jsPsychFullscreen,
-    message: '<p style="font-size: 24px;">全画表示に切り替えます</p>',
+    message: '<p style="font-size: 24px;">全画表示に切り替えます?</p>',
     button_label: "開始",
     fullscreen_mode: true
   };
@@ -146,10 +147,7 @@
     choices: "NO_KEYS",
     trial_duration: 3000,
     data: {
-      task: "encoding",
-      participant_id: function() {
-        return participant_id;
-      }
+      task: "encoding"
     }
   };
 
@@ -191,20 +189,12 @@
       data.participant_id = participant_id;
     }
   };
-
-  const rest_20s = {
-    type: jsPsychHtmlKeyboardResponse,
-    stimulus: "",
-    choices: "NO_KEYS",
-    trial_duration: 500,
-    data: {
-      task: "rest",
-      participant_id: function() {
-        return participant_id;
-      }
-    }
-  };
-
+const rest_20s = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "",
+  choices: "NO_KEYS",
+  trial_duration: 500
+};
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
@@ -237,10 +227,8 @@
             cell.innerHTML = "";
             userSelections = userSelections.filter(x => x !== i);
           } else {
-            if (userSelections.length < 3) {
-              cell.innerHTML = "<div class='circle'></div>";
-              userSelections.push(i);
-            }
+            cell.innerHTML = "<div class='circle'></div>";
+            userSelections.push(i);
           }
 
           doneButton.disabled = (userSelections.length !== 3);
@@ -260,39 +248,12 @@
     }
   };
 
-
-  const wait_1s_after_retrieval = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: "",
-  choices: "NO_KEYS",
-  trial_duration: 1000,
-  data: {
-    task: "wait_after_retrieval",
-    participant_id: function() {
-      return participant_id;
-    }
-  }
-};
-  
   const debrief = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: "下の課題完了ボタンを押た後，ブラウザを閉じて終了してください。ありがとうございました。",
-    choices: ["課題完了"],
-    data: {
-      task: "debrief",
-      participant_id: function() {
-        return participant_id;
-      }
-    }
+    stimulus: "<p>下の課題完了ボタンを押た後，ブラウザを閉じて終了してください。ありがとうございました。</p>",
+    choices: ["課題完了"]
   };
 
-  const save_data = {
-    type: jsPsychPipe,
-    action: "save",
-    experiment_id: expID,
-    filename: () => `dot_${participant_id}.csv`,
-    data_string: () => jsPsych.data.get().csv()
-  };
   const timeline = [];
   timeline.push(fullscreen);
   timeline.push(form_trial);
@@ -302,12 +263,19 @@
     timeline.push(distraction);
     timeline.push(rest_20s);
     timeline.push(retrieval);
-   timeline.push(wait_1s_after_retrieval);
   }
 
-  timeline.push(debrief);
-  timeline.push(save_data);
 
-  jsPsych.run(timeline);
+  const save_data = {
+  type: jsPsychPipe,
+  action: "save",
+  experiment_id: "8vGt7oHuZjuJ",
+  filename: filename,
+  data_string: ()=>jsPsych.data.get().csv()
+};
+  
+  timeline.push(debrief);
+
+  jsPsych.run(timeline,save_data);
 </script>
 </html>
