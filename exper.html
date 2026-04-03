@@ -13,9 +13,6 @@
 
   <link href="https://unpkg.com/jspsych@7.3.2/css/jspsych.css" rel="stylesheet" />
 
-
-
-  
   <style>
     .grid {
       display: grid;
@@ -69,10 +66,10 @@
       font-size: 20px;
     }
 
-      .jspsych-btn {
-    font-size: 20px;
-    padding: 10px 20px;
-  }
+    .jspsych-btn {
+      font-size: 20px;
+      padding: 10px 20px;
+    }
   </style>
 </head>
 <body></body>
@@ -84,14 +81,12 @@
     }
   });
 
-  const subject_id = jsPsych.randomization.randomID(10);
-  const filename = `${subject_id}.csv`;
-
+  const expID = "8vGt7oHuZjuJ";
   let participant_id = "";
   let encoding_positions = [];
   let userSelections = [];
   let fClickCount = 0;
-  
+
   const predefinedEncodingPositions = [
     [[4,0],[3,1],[2,2]],
     [[4,2],[4,3],[4,4]],
@@ -191,12 +186,14 @@
       data.participant_id = participant_id;
     }
   };
-const rest_20s = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: "",
-  choices: "NO_KEYS",
-  trial_duration: 500
-};
+
+  const rest_20s = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "",
+    choices: "NO_KEYS",
+    trial_duration: 500
+  };
+
   const retrieval = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
@@ -252,7 +249,7 @@ const rest_20s = {
 
   const debrief = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: "<p>下の課題完了ボタンを押た後，ブラウザを閉じて終了してください。ありがとうございました。</p>",
+    stimulus: "<p>下の課題完了ボタンを押た後、ブラウザを閉じて終了してください。ありがとうございました。</p>",
     choices: ["課題完了"]
   };
 
