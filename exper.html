@@ -85,11 +85,14 @@ const filename = `${subject_id}.csv`;
     }
   });
 
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
+
   let participant_id = "";
   let encoding_positions = [];
   let userSelections = [];
   let fClickCount = 0;
-
+  
   const predefinedEncodingPositions = [
     [[4,0],[3,1],[2,2]],
     [[4,2],[4,3],[4,4]],
@@ -254,6 +257,14 @@ const rest_20s = {
     choices: ["課題完了"]
   };
 
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: expID,
+    filename: () => `dot_${participant_id}.csv`,
+    data_string: () => jsPsych.data.get().csv()
+  };
+
   const timeline = [];
   timeline.push(fullscreen);
   timeline.push(form_trial);
@@ -265,17 +276,9 @@ const rest_20s = {
     timeline.push(retrieval);
   }
 
-
-  const save_data = {
-  type: jsPsychPipe,
-  action: "save",
-  experiment_id: "8vGt7oHuZjuJ",
-  filename: filename,
-  data_string: ()=>jsPsych.data.get().csv()
-};
-  
   timeline.push(debrief);
+  timeline.push(save_data);
 
-  jsPsych.run(timeline,save_data);
+  jsPsych.run(timeline);
 </script>
 </html>
