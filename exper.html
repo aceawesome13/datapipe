@@ -120,6 +120,24 @@
     }
   };
 
+const welcome = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus:
+      "<p style='font-size:15pt;'>3つの点の位置を覚えてください。</p>" +
+      "<p style='font-size:15pt;'>上と同じペアを下から選んでください。</p>" +
+      "<img src='/datapipe/ex-01.png' style='width:250px; height:250px;'>",
+    choices: ["次へ"]
+  };
+
+  const instraction = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus:
+      "<p style='font-size:15pt;'>画面上のFをできるだけ早く押してください。</p>" +
+      "<img src='/datapipe/ex-02.png' style='width:250px; height:250px;'>",
+    choices: ["次へ"]
+  };
+  
+  
   const encoding = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function() {
@@ -265,6 +283,8 @@
   const timeline = [];
   timeline.push(fullscreen);
   timeline.push(form_trial);
+  timeline.push(welcome);
+  timeline.push(instruction);
 
   for (let i = 0; i < 5; i++) {
     timeline.push(encoding);
